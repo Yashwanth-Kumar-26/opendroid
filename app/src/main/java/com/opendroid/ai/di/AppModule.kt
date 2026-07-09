@@ -29,4 +29,7 @@ object AppModule {
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }
+
+    // ModelsDevManager is automatically provided via @Inject Singleton annotation
+    // DynamicProviderRegistry is automatically provided via @Inject Singleton annotation
 }

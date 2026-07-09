@@ -9,6 +9,9 @@ import com.opendroid.ai.data.db.dao.MemoryDao
 import com.opendroid.ai.data.db.dao.PlanDao
 import com.opendroid.ai.data.db.dao.NotificationDao
 import com.opendroid.ai.data.db.dao.TaskHistoryDao
+import com.opendroid.ai.data.db.dao.ModelsDevCacheDao
+import com.opendroid.ai.data.db.dao.ModelsDevSyncDao
+import com.opendroid.ai.data.db.dao.ModelsDevProviderDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,7 +33,12 @@ object DatabaseModule {
             OpenDroidDatabase::class.java,
             "opendroid_database"
         )
-        .addMigrations(OpenDroidDatabase.MIGRATION_1_2, OpenDroidDatabase.MIGRATION_2_3, OpenDroidDatabase.MIGRATION_3_4)
+        .addMigrations(
+            OpenDroidDatabase.MIGRATION_1_2,
+            OpenDroidDatabase.MIGRATION_2_3,
+            OpenDroidDatabase.MIGRATION_3_4,
+            OpenDroidDatabase.MIGRATION_4_5
+        )
         .fallbackToDestructiveMigration()
         .build()
     }
@@ -62,4 +70,16 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideNotificationDao(db: OpenDroidDatabase): NotificationDao = db.notificationDao()
+
+    @Provides
+    @Singleton
+    fun provideModelsDevCacheDao(db: OpenDroidDatabase): ModelsDevCacheDao = db.modelsDevCacheDao()
+
+    @Provides
+    @Singleton
+    fun provideModelsDevSyncDao(db: OpenDroidDatabase): ModelsDevSyncDao = db.modelsDevSyncDao()
+
+    @Provides
+    @Singleton
+    fun provideModelsDevProviderDao(db: OpenDroidDatabase): ModelsDevProviderDao = db.modelsDevProviderDao()
 }

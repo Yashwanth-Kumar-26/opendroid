@@ -23,7 +23,8 @@ class SettingsViewModel @Inject constructor(
     val settingsRepository: SettingsRepository,
     val notificationDao: com.opendroid.ai.data.db.dao.NotificationDao,
     private val llmProviderFactory: Lazy<com.opendroid.ai.core.llm.LLMProviderFactory>,
-    private val modelFetcher: Lazy<com.opendroid.ai.core.llm.ModelFetcher>
+    private val modelFetcher: Lazy<com.opendroid.ai.core.llm.ModelFetcher>,
+    private val dynamicProviderRegistry: Lazy<com.opendroid.ai.core.llm.DynamicProviderRegistry>
 ) : ViewModel() {
 
     private val _llmConfig = MutableStateFlow(LLMConfig())
@@ -31,6 +32,9 @@ class SettingsViewModel @Inject constructor(
 
     private val _modelsLoading = MutableStateFlow(false)
     val modelsLoading: StateFlow<Boolean> = _modelsLoading
+
+    private val _availableProviders = MutableStateFlow<List<String>>(emptyList())
+    val availableProviders: StateFlow<List<String>> = _availableProviders
 
     private val apiKeyUpdateJobs = mutableMapOf<String, Job>()
     private var activeModelJob: Job? = null
@@ -49,7 +53,36 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             // Wait for initial config loading
             settingsRepository.llmConfig.first()
+            // Load available providers from registry (hardcoded + dynamic)
+            loadAvailableProviders()
             refreshModels(force = false)
+        }
+    }
+
+    private fun loadAvailableProviders() {
+        viewModelScope.launch {
+            try {
+                val providers = dynamicProviderRegistry.get().getAllProviders()
+                _availableProviders.value = providers
+                android.util.Log.d("SettingsViewModel", "Loaded ${providers.size} providers (hardcoded + dynamic)")
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsViewModel", "Failed to load providers: ${e.message}", e)
+                // Fallback to hardcoded list on error
+                _availableProviders.value = listOf(
+                    "Google Gemini",
+                    "OpenAI",
+                    "Anthropic Claude",
+                    "Groq",
+                    "Mistral AI",
+                    "OpenRouter",
+                    "Together AI",
+                    "Cohere",
+                    "DeepSeek",
+                    "Copilot API",
+                    "Custom OpenAI Compatible",
+                    "Ollama"
+                )
+            }
         }
     }
 

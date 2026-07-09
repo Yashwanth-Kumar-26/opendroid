@@ -44,21 +44,7 @@ fun SettingsScreen(
     modifier: Modifier = Modifier
 ) {
     val config by viewModel.llmConfig.collectAsState()
-    
-    val providers = listOf(
-        "Google Gemini",
-        "OpenAI",
-        "Anthropic Claude",
-        "Groq",
-        "Mistral AI",
-        "OpenRouter",
-        "Together AI",
-        "Cohere",
-        "DeepSeek",
-        "Copilot API",
-        "Custom OpenAI Compatible",
-        "Ollama"
-    )
+    val providers by viewModel.availableProviders.collectAsState()
 
     var providerDropdownExpanded by remember { mutableStateOf(false) }
     var keysSectionExpanded by remember { mutableStateOf(false) }
@@ -100,13 +86,25 @@ fun SettingsScreen(
                     colors = CardDefaults.cardColors(containerColor = CardBackground)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "ACTIVE BRAIN PROVIDER",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            color = AccentCyan
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "ACTIVE BRAIN PROVIDER",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                color = AccentCyan
+                            )
+                            Text(
+                                text = "${providers.size} providers available",
+                                fontSize = 10.sp,
+                                fontFamily = FontFamily.Monospace,
+                                color = AccentNeonGreen
+                            )
+                        }
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         // Dropdown menu trigger
